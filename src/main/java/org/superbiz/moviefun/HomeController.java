@@ -41,27 +41,37 @@ public class HomeController {
 
     @GetMapping("/setup")
     public String setup(Map<String, Object> model) {
-        for (Movie movie : movieFixtures.load()) {
 
 
-            transactionTemplateMovie.execute(new TransactionCallbackWithoutResult() {
+        movieFixtures.load().forEach(movie -> {
+
+            moviesBean.addMovie(movie);
+
+           /*// transactionTemplateMovie.execute(new TransactionCallbackWithoutResult() {
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
 
 
                     moviesBean.addMovie(movie);
 
                 }
-            });
-        }
-        for (Album album : albumFixtures.load()) {
-            transactionTemplateAlbum.execute(new TransactionCallbackWithoutResult() {
+            );*/
+
+
+        });
+
+
+        albumFixtures.load().forEach(album -> {
+
+            albumsBean.addAlbum(album);
+
+          /*  transactionTemplateAlbum.execute(new TransactionCallbackWithoutResult() {
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
 
-                    albumsBean.addAlbum(album);
+
 
                 }
-            });
-        }
+            });*/
+        });
 
 
         model.put("movies", moviesBean.getMovies());
