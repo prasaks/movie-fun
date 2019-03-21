@@ -41,7 +41,7 @@ public class AlbumsDatabaseConfig {
     }
 
     @Bean
-    public TransactionTemplate transactionTemplateAlbum(PlatformTransactionManager albumsTransactionManager){
+    public TransactionTemplate transactionTemplateAlbum(PlatformTransactionManager albumsTransactionManager) {
 
         return new TransactionTemplate(albumsTransactionManager);
     }

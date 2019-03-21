@@ -25,13 +25,13 @@ public class HomeController {
     private final TransactionTemplate transactionTemplateMovie;
     private final TransactionTemplate transactionTemplateAlbum;
 
-    public HomeController(MoviesBean moviesBean, AlbumsBean albumsBean, MovieFixtures movieFixtures, AlbumFixtures albumFixtures, TransactionTemplate transactionTemplateMovie,TransactionTemplate transactionTemplateAlbum) {
+    public HomeController(MoviesBean moviesBean, AlbumsBean albumsBean, MovieFixtures movieFixtures, AlbumFixtures albumFixtures, TransactionTemplate transactionTemplateMovie, TransactionTemplate transactionTemplateAlbum) {
         this.moviesBean = moviesBean;
         this.albumsBean = albumsBean;
         this.movieFixtures = movieFixtures;
         this.albumFixtures = albumFixtures;
         this.transactionTemplateMovie = transactionTemplateMovie;
-        this.transactionTemplateAlbum=transactionTemplateAlbum;
+        this.transactionTemplateAlbum = transactionTemplateAlbum;
     }
 
     @GetMapping("/")
@@ -41,24 +41,27 @@ public class HomeController {
 
     @GetMapping("/setup")
     public String setup(Map<String, Object> model) {
+        for (Movie movie : movieFixtures.load()) {
 
-        transactionTemplateMovie.execute(new TransactionCallbackWithoutResult() {
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                for (Movie movie : movieFixtures.load()) {
+
+            transactionTemplateMovie.execute(new TransactionCallbackWithoutResult() {
+                protected void doInTransactionWithoutResult(TransactionStatus status) {
+
 
                     moviesBean.addMovie(movie);
-                }
-            }
-        });
 
-        transactionTemplateAlbum.execute(new TransactionCallbackWithoutResult() {
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                for (Album album : albumFixtures.load()) {
+                }
+            });
+        }
+        for (Album album : albumFixtures.load()) {
+            transactionTemplateAlbum.execute(new TransactionCallbackWithoutResult() {
+                protected void doInTransactionWithoutResult(TransactionStatus status) {
+
                     albumsBean.addAlbum(album);
-                }
-            }
-        });
 
+                }
+            });
+        }
 
 
         model.put("movies", moviesBean.getMovies());

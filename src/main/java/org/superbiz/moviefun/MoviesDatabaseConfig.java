@@ -42,7 +42,7 @@ public class MoviesDatabaseConfig {
     }
 
     @Bean
-    public TransactionTemplate transactionTemplateMovie(PlatformTransactionManager moviesTransactionManager){
+    public TransactionTemplate transactionTemplateMovie(PlatformTransactionManager moviesTransactionManager) {
 
         return new TransactionTemplate(moviesTransactionManager);
     }
