@@ -1,6 +1,10 @@
 package org.superbiz.moviefun;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.superbiz.moviefun.albums.Album;
 import org.superbiz.moviefun.albums.AlbumFixtures;
@@ -18,12 +22,16 @@ public class HomeController {
     private final AlbumsBean albumsBean;
     private final MovieFixtures movieFixtures;
     private final AlbumFixtures albumFixtures;
+    private final TransactionTemplate transactionTemplateMovie;
+    private final TransactionTemplate transactionTemplateAlbum;
 
-    public HomeController(MoviesBean moviesBean, AlbumsBean albumsBean, MovieFixtures movieFixtures, AlbumFixtures albumFixtures) {
+    public HomeController(MoviesBean moviesBean, AlbumsBean albumsBean, MovieFixtures movieFixtures, AlbumFixtures albumFixtures, TransactionTemplate transactionTemplateMovie,TransactionTemplate transactionTemplateAlbum) {
         this.moviesBean = moviesBean;
         this.albumsBean = albumsBean;
         this.movieFixtures = movieFixtures;
         this.albumFixtures = albumFixtures;
+        this.transactionTemplateMovie = transactionTemplateMovie;
+        this.transactionTemplateAlbum=transactionTemplateAlbum;
     }
 
     @GetMapping("/")
@@ -33,13 +41,25 @@ public class HomeController {
 
     @GetMapping("/setup")
     public String setup(Map<String, Object> model) {
-        for (Movie movie : movieFixtures.load()) {
-            moviesBean.addMovie(movie);
-        }
 
-        for (Album album : albumFixtures.load()) {
-            albumsBean.addAlbum(album);
-        }
+        transactionTemplateMovie.execute(new TransactionCallbackWithoutResult() {
+            protected void doInTransactionWithoutResult(TransactionStatus status) {
+                for (Movie movie : movieFixtures.load()) {
+
+                    moviesBean.addMovie(movie);
+                }
+            }
+        });
+
+        transactionTemplateAlbum.execute(new TransactionCallbackWithoutResult() {
+            protected void doInTransactionWithoutResult(TransactionStatus status) {
+                for (Album album : albumFixtures.load()) {
+                    albumsBean.addAlbum(album);
+                }
+            }
+        });
+
+
 
         model.put("movies", moviesBean.getMovies());
         model.put("albums", albumsBean.getAlbums());
