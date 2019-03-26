@@ -42,9 +42,9 @@ public class S3Store implements BlobStore {
             byte[] bytes = IOUtils.toByteArray(content);
 
             return Optional.of(new Blob(
-                name,
-                new ByteArrayInputStream(bytes),
-                tika.detect(bytes)
+                    name,
+                    new ByteArrayInputStream(bytes),
+                    tika.detect(bytes)
             ));
         }
     }
@@ -52,11 +52,26 @@ public class S3Store implements BlobStore {
     @Override
     public void deleteAll() {
         List<S3ObjectSummary> summaries = s3
-            .listObjects(bucketName)
-            .getObjectSummaries();
+                .listObjects(bucketName)
+                .getObjectSummaries();
 
+/*
         for (S3ObjectSummary summary : summaries) {
             s3.deleteObject(bucketName, summary.getKey());
         }
+
+        // for loop new feature in java 8
+        summaries.forEach(i -> {
+            s3.deleteObject(bucketName, i.getKey());
+        });
+*/
+
+        //forall DML feature in java 8
+        summaries.parallelStream().forEach(j -> {
+            s3.deleteObject(bucketName, j.getKey());
+        });
+
     }
+
+
 }
