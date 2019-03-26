@@ -14,7 +14,7 @@ public class RabbitConfig {
 
     @Value("${rabbitmq.queue}") String rabbitMqQueue;
 
-    @Bean
+   @Bean
     public IntegrationFlow amqpInbound(ConnectionFactory connectionFactory, AlbumsUpdateMessageConsumer consumer) {
         return IntegrationFlows
                 .from(Amqp.inboundAdapter(connectionFactory, rabbitMqQueue))
